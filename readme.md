@@ -25,6 +25,10 @@
   - Copy link vừa rồi vào đây  
   ![](img/gitclone.png)
 
+### Chạy
+- Chạy file [query này](src/main/java/app/program/data/console.sql) trước
+- Chạy chương trình: chuột phải [file này](src/main/java/app/Main.java) > Run 'Main.main()'
+    
 ### Troubleshoot
 - MySQL: Phải có hoặc đã setup tên và mật khẩu
 - Trong trường hợp không thể sử dụng JDBC để kết nối MySQL thì phải cài driver
