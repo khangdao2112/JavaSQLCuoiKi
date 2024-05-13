@@ -6,11 +6,12 @@ import java.sql.Statement;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import app.program.menu.menuStudents;
+import app.program.menu.*;
 import util.DBTablePrinter;
 
 public class MainProgram extends AppMainHandler {
     public menuStudents menuStudents = new menuStudents();
+    public menuCourses menuCourses = new menuCourses();
 
     public static void selectionCursor() {
         System.out.print("└─► ");
@@ -32,8 +33,8 @@ public class MainProgram extends AppMainHandler {
         System.out.print("""
                 ┌──────────────────────────────────┐
                 │  ____  __  __ ____               │
-                │ / ___||  \\\\/  / ___|       v1.0.0 │
-                │ \\\\___ \\\\| |\\\\/| \\\\___ \\\\      Student │
+                │ / ___||  \\/  / ___|       v1.0.0 │
+                │ \\___ \\| |\\/| \\___ \\      Student │
                 │  ___) | |  | |___) |  Management │
                 │ |____/|_|  |_|____/       System │
                 │                                  │
@@ -66,7 +67,7 @@ public class MainProgram extends AppMainHandler {
                             menuStudents();
                             break;
                         case 2:
-                            //menuCourses();
+                            menuCourses();
                             break;
                         case 3:
                             //menuEnrollments();
@@ -98,13 +99,12 @@ public class MainProgram extends AppMainHandler {
         while(true) {
             System.out.println();
             System.out.println("Danh sách các sinh viên");
-            printStudentsList();
+            printTable("students");
             System.out.print("""
                     │ Sử dụng các phím số để chọn các chức năng tương ứng
                     │ 1. Thêm sinh viên
                     │ 2. Sửa sinh viên
                     │ 3. Xóa sinh viên
-                    │ 4. Chọn sinh viên
                     │ 0. Quay về menu
                     """);
             selectionCursor();
@@ -120,8 +120,6 @@ public class MainProgram extends AppMainHandler {
                             break;
                         case 3:
                             menuStudents.menuStudentsRemove();
-                            break;
-                        case 4:
                             break;
                         case 0:
                             return;
@@ -141,22 +139,87 @@ public class MainProgram extends AppMainHandler {
         }
     }
 
-    public void printStudentsList() {
+    public void menuCourses() {
+        Scanner sc = new Scanner(System.in);
+        while(true) {
+            System.out.println();
+            System.out.println("Danh sách các khóa học");
+            printTable("courses");
+            System.out.print("""
+                    │ Sử dụng các phím số để chọn các chức năng tương ứng
+                    │ 1. Thêm khóa học
+                    │ 2. Sửa khóa học
+                    │ 3. Xóa khóa học
+                    │ 0. Quay về menu
+                    """);
+            selectionCursor();
+            while (true){
+                try {
+                    byte selection = sc.nextByte();
+                    switch (selection) {
+                        case 1:
+                            menuCourses.menuCoursesInsert();
+                            break;
+                        case 2:
+                            menuCourses.menuCoursesEdit();
+                            break;
+                        case 3:
+                            menuCourses.menuCoursesRemove();
+                            break;
+                        case 0:
+                            return;
+                        default:
+                            System.out.println("Vui lòng nhập lại");
+                            selectionCursor();
+                            continue;
+                    }
+                    break;
+                } catch (InputMismatchException e) {
+                    System.out.println("Vui lòng nhập lại");
+                    selectionCursor();
+                    sc.next();
+                    continue;
+                }
+            }
+        }
+    }
+
+    public void printTable(String table) {
         try {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(
-                "SELECT\n" +
-                "    student_id as 'MSSV',\n" +
-                "    CONCAT(last_name,' ',middle_name,' ',first_name) AS 'Họ và tên',\n" +
-                "    gender AS 'Giới tính',\n" +
-                "    date_of_birth AS 'Ngày sinh',\n" +
-                "    birthplace AS 'Quê quán',\n" +
-                "    contact_number AS 'Số điện thoại',\n" +
-                "    email AS 'Email',\n" +
-                "    address AS 'Địa chỉ'\n" +
-                "FROM students;"
-            );
-            DBTablePrinter.printResultSet(resultSet);
+            if (table == "students") {
+                ResultSet resultSet = statement.executeQuery(
+                        "SELECT\n" +
+                                "    student_id as 'MSSV',\n" +
+                                "    CONCAT(last_name,' ',middle_name,' ',first_name) AS 'Họ và tên',\n" +
+                                "    gender AS 'Giới tính',\n" +
+                                "    date_of_birth AS 'Ngày sinh',\n" +
+                                "    birthplace AS 'Quê quán',\n" +
+                                "    contact_number AS 'Số điện thoại',\n" +
+                                "    email AS 'Email',\n" +
+                                "    address AS 'Địa chỉ'\n" +
+                                "FROM students;"
+                );
+                DBTablePrinter.printResultSet(resultSet);
+            }
+            if (table == "courses") {
+                ResultSet resultSet = statement.executeQuery(
+                        "SELECT\n" +
+                                "    course_id AS 'ID khóa',\n" +
+                                "    course_name AS 'Tên khóa',\n" +
+                                "    course_description AS 'Thông tin khóa',\n" +
+                                "    instructor AS 'Giảng viên',\n" +
+                                "    department AS 'Khoa'\n" +
+                                "    FROM courses;"
+                );
+                DBTablePrinter.printResultSet(resultSet);
+            }
+            if (table == "enrollments") {
+                ResultSet resultSet = statement.executeQuery(
+                        ""
+                );
+                DBTablePrinter.printResultSet(resultSet);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

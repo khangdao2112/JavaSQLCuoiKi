@@ -14,7 +14,6 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class menuStudents extends AppMainHandler {
-
     public void menuStudentsInsert() {
         Scanner sc = new Scanner(System.in);
         sc.useDelimiter("\\n");
@@ -23,7 +22,7 @@ public class menuStudents extends AppMainHandler {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         try {
             Statement statement = MainProgram.connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT student_id FROM javasqlcuoiki.students ORDER BY student_id DESC LIMIT 1");
+            ResultSet resultSet = statement.executeQuery("SELECT student_id FROM students ORDER BY student_id DESC LIMIT 1");
             resultSet.next();
             int studentIDNewest = resultSet.getInt("student_id");
             studentIDNewest++;
@@ -156,7 +155,7 @@ public class menuStudents extends AppMainHandler {
                         byte selection = sc.nextByte();
                         switch (selection) {
                             case 1:
-                                String query = "INSERT INTO javasqlcuoiki.students (last_name, middle_name, first_name, gender, date_of_birth, birthplace, contact_number, email, address) VALUE" +
+                                String query = "INSERT INTO students (last_name, middle_name, first_name, gender, date_of_birth, birthplace, contact_number, email, address) VALUE" +
                                         "(" +
                                         "'" + studentsColumns.lastName + "'," +
                                         "'" + studentsColumns.middleName + "'," +
