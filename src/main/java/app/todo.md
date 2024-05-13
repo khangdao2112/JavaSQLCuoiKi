@@ -1,0 +1,18 @@
+- QLSV
+  - Xem danh sách
+  - Thêm SV
+  - Edit SV theo ID
+  - Xóa SV theo ID
+  - Chọn SV
+    - Xem ghi danh
+    - Xem khóa đang học
+- QL Khóa học
+  - Xem danh sách
+  - Thêm khóa học
+  - Edit khóa học theo ID
+  - Xóa khóa học theo ID
+  - Chọn khóa học
+    - Xem SV nào đang học
+- QL Ghi danh
+  - Xem danh sách
+  - Thêm 
