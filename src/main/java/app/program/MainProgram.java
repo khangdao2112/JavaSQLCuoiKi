@@ -33,7 +33,7 @@ public class MainProgram extends AppMainHandler {
         System.out.print("""
                 ┌──────────────────────────────────┐
                 │  ____  __  __ ____               │
-                │ / ___||  \\/  / ___|       v1.0.0 │
+                │ / ___||  \\/  / ___|       v0.9.0 │
                 │ \\___ \\| |\\/| \\___ \\      Student │
                 │  ___) | |  | |___) |  Management │
                 │ |____/|_|  |_|____/       System │
