@@ -3,8 +3,7 @@ package app.program.menu;
 import app.program.AppMainHandler;
 import app.program.MainProgram;
 import app.program.SQLOperations;
-import app.program.data.CoursesColumns;
-import app.program.data.StudentsColumns;
+import app.program.StringPrefix;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,14 +11,68 @@ import java.sql.Statement;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class menuCourses extends AppMainHandler {
-    public void menuCoursesInsert() {
+public class MenuCourses extends AppMainHandler {
+    private Statement statement = connection.createStatement();
+    private SQLOperations sqlOperations = new SQLOperations();
+
+    private String courseName;
+    private String courseDescription;
+    private String instructor;
+    private String department;
+
+    public MenuCourses() throws SQLException {
+
+    }
+
+    public void menuSelection() {
         Scanner sc = new Scanner(System.in);
-        sc.useDelimiter("\\n");
-        SQLOperations sqlOperations = new SQLOperations();
-        CoursesColumns coursesColumns = new CoursesColumns();
+        while(true) {
+            System.out.println();
+            System.out.println("Danh sách các khóa học");
+            MainProgram.printTable("courses");
+            System.out.print("""
+                    │ Sử dụng các phím số để chọn các chức năng tương ứng
+                    │ 1. Thêm khóa học
+                    │ 2. Sửa khóa học
+                    │ 3. Xóa khóa học
+                    │ 0. Quay về menu
+                    """);
+            StringPrefix.selectionCursor();
+            while (true){
+                try {
+                    byte selection = sc.nextByte();
+                    switch (selection) {
+                        case 1:
+                            menuCoursesInsert();
+                            break;
+                        case 2:
+                            menuCoursesEdit();
+                            break;
+                        case 3:
+                            menuCoursesRemove();
+                            break;
+                        case 0:
+                            return;
+                        default:
+                            System.out.println("Vui lòng nhập lại");
+                            StringPrefix.selectionCursor();
+                            continue;
+                    }
+                    break;
+                } catch (InputMismatchException e) {
+                    System.out.println("Vui lòng nhập lại");
+                    StringPrefix.selectionCursor();
+                    sc.next();
+                    continue;
+                }
+            }
+        }
+    }
+
+    public void menuCoursesInsert() {
         try {
-            Statement statement = MainProgram.connection.createStatement();
+            Scanner sc = new Scanner(System.in);
+            sc.useDelimiter("\\n");
             ResultSet resultSet = statement.executeQuery("SELECT course_id FROM courses ORDER BY course_id DESC LIMIT 1");
             resultSet.next();
             int coursesIDNewest = resultSet.getInt("course_id");
@@ -27,50 +80,50 @@ public class menuCourses extends AppMainHandler {
 
             System.out.println("Nhập thông tin khóa thứ " + coursesIDNewest);
             while (true) {
-                System.out.print(MainProgram.inputHead() + "Nhập tên khóa: ");
+                System.out.print(StringPrefix.inputHead() + "Nhập tên khóa: ");
                 while (true) {
-                    coursesColumns.courseName = sc.nextLine();
-                    if (coursesColumns.courseName.isEmpty()) {
-                        System.out.print(MainProgram.errorHead() + "Không được để trống: ");
-                    } else if (sqlOperations.varcharLengthExceedCheck(coursesColumns.courseName, 50)) {
-                        System.out.print(MainProgram.errorHead() + "Nội dung phải nhỏ hơn 100 ký tự: ");
+                    courseName = sc.nextLine();
+                    if (courseName.isEmpty()) {
+                        System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+                    } else if (sqlOperations.varcharLengthExceedCheck(courseName, 50)) {
+                        System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 100 ký tự: ");
                     } else break;
                 }
 
-                System.out.print(MainProgram.inputHead() + "Nhập mô tả khóa: ");
+                System.out.print(StringPrefix.inputHead() + "Nhập mô tả khóa: ");
                 while (true) {
-                    coursesColumns.courseDescription = sc.nextLine();
-                    if (coursesColumns.courseDescription.isEmpty()) {
-                        System.out.print(MainProgram.errorHead() + "Không được để trống: ");
+                    courseDescription = sc.nextLine();
+                    if (courseDescription.isEmpty()) {
+                        System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
                     } else break;
                 }
 
-                System.out.print(MainProgram.inputHead() + "Nhập tên giảng viên: ");
+                System.out.print(StringPrefix.inputHead() + "Nhập tên giảng viên: ");
                 while (true) {
-                    coursesColumns.instructor = sc.nextLine();
-                    if (coursesColumns.instructor.isEmpty()) {
-                        System.out.print(MainProgram.errorHead() + "Không được để trống: ");
-                    } else if (sqlOperations.varcharLengthExceedCheck(coursesColumns.instructor, 50)) {
-                        System.out.print(MainProgram.errorHead() + "Nội dung phải nhỏ hơn 50 ký tự: ");
+                    instructor = sc.nextLine();
+                    if (instructor.isEmpty()) {
+                        System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+                    } else if (sqlOperations.varcharLengthExceedCheck(instructor, 50)) {
+                        System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 50 ký tự: ");
                     } else break;
                 }
 
-                System.out.print(MainProgram.inputHead() + "Nhập tên khoa: ");
+                System.out.print(StringPrefix.inputHead() + "Nhập tên khoa: ");
                 while (true) {
-                    coursesColumns.department = sc.nextLine();
-                    if (coursesColumns.department.isEmpty()) {
-                        System.out.print(MainProgram.errorHead() + "Không được để trống: ");
-                    } else if (sqlOperations.varcharLengthExceedCheck(coursesColumns.department, 50)) {
-                        System.out.print(MainProgram.errorHead() + "Nội dung phải nhỏ hơn 100 ký tự: ");
+                    department = sc.nextLine();
+                    if (department.isEmpty()) {
+                        System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+                    } else if (sqlOperations.varcharLengthExceedCheck(department, 50)) {
+                        System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 100 ký tự: ");
                     } else break;
                 }
 
                 System.out.println();
                 System.out.println("Thông tin khóa thứ " + coursesIDNewest + ":");
-                System.out.println(MainProgram.bulletHead() + "Tên khóa: " + coursesColumns.courseName);
-                System.out.println(MainProgram.bulletHead() + "Thông tin khóa: " + coursesColumns.courseDescription);
-                System.out.println(MainProgram.bulletHead() + "Giảng viên: " + coursesColumns.instructor);
-                System.out.println(MainProgram.bulletHead() + "Khoa: " + coursesColumns.department);
+                System.out.println(StringPrefix.bulletHead() + "Tên khóa: " + courseName);
+                System.out.println(StringPrefix.bulletHead() + "Thông tin khóa: " + courseDescription);
+                System.out.println(StringPrefix.bulletHead() + "Giảng viên: " + instructor);
+                System.out.println(StringPrefix.bulletHead() + "Khoa: " + department);
                 System.out.println("1. Xác nhận");
                 System.out.println("2. Nhập lại");
                 System.out.println("0. Hủy");
@@ -81,10 +134,10 @@ public class menuCourses extends AppMainHandler {
                             case 1:
                                 String query = "INSERT INTO courses (course_name, course_description, instructor, department)" +
                                         "VALUE (\n" +
-                                        "'" + coursesColumns.courseName + "'," +
-                                        "'" + coursesColumns.courseDescription + "'," +
-                                        "'" + coursesColumns.instructor +"'," +
-                                        "'" + coursesColumns.department + "'" +
+                                        "'" + courseName + "'," +
+                                        "'" + courseDescription + "'," +
+                                        "'" + instructor +"'," +
+                                        "'" + department + "'" +
                                         ")";
                                 sqlOperations.insertRows(query);
                                 System.out.print("Nhấn enter để tiếp tục: ");
@@ -95,12 +148,12 @@ public class menuCourses extends AppMainHandler {
                             case 0:
                                 return;
                             default:
-                                System.out.print(MainProgram.errorHead() + "Vui lòng nhập lại: ");
+                                System.out.print(StringPrefix.errorHead() + "Vui lòng nhập lại: ");
                                 continue;
                         }
                         break;
                     } catch (InputMismatchException e) {
-                        System.out.print(MainProgram.errorHead() + "Vui lòng nhập lại: ");
+                        System.out.print(StringPrefix.errorHead() + "Vui lòng nhập lại: ");
                         sc.next();
                         continue;
                     }
@@ -112,18 +165,15 @@ public class menuCourses extends AppMainHandler {
     }
 
     public void menuCoursesEdit() {
-        Scanner sc = new Scanner(System.in);
-        sc.useDelimiter("\\n");
-        SQLOperations sqlOperations = new SQLOperations();
-        CoursesColumns coursesColumns = new CoursesColumns();
         try {
+            Scanner sc = new Scanner(System.in);
+            sc.useDelimiter("\\n");
             while (true) {
-                System.out.print(MainProgram.inputHead() + "Chọn khóa cần sửa: ");
+                System.out.print(StringPrefix.inputHead() + "Chọn khóa cần sửa: ");
                 int selectionCoursesID;
                 while (true) {
                     try {
                         boolean success = false;
-                        Statement statement = MainProgram.connection.createStatement();
                         ResultSet resultSet = statement.executeQuery("SELECT course_id FROM courses ORDER BY course_id");
                         selectionCoursesID = sc.nextInt();
                         while (resultSet.next()) {
@@ -146,50 +196,50 @@ public class menuCourses extends AppMainHandler {
 
                 System.out.println("Nhập thông tin khóa thứ " + selectionCoursesID);
                 while (true) {
-                    System.out.print(MainProgram.inputHead() + "Nhập tên khóa: ");
+                    System.out.print(StringPrefix.inputHead() + "Nhập tên khóa: ");
                     while (true) {
-                        coursesColumns.courseName = sc.nextLine();
-                        if (coursesColumns.courseName.isEmpty()) {
-                            System.out.print(MainProgram.errorHead() + "Không được để trống: ");
-                        } else if (sqlOperations.varcharLengthExceedCheck(coursesColumns.courseName, 50)) {
-                            System.out.print(MainProgram.errorHead() + "Nội dung phải nhỏ hơn 100 ký tự: ");
+                        courseName = sc.nextLine();
+                        if (courseName.isEmpty()) {
+                            System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+                        } else if (sqlOperations.varcharLengthExceedCheck(courseName, 50)) {
+                            System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 100 ký tự: ");
                         } else break;
                     }
 
-                    System.out.print(MainProgram.inputHead() + "Nhập mô tả khóa: ");
+                    System.out.print(StringPrefix.inputHead() + "Nhập mô tả khóa: ");
                     while (true) {
-                        coursesColumns.courseDescription = sc.nextLine();
-                        if (coursesColumns.courseDescription.isEmpty()) {
-                            System.out.print(MainProgram.errorHead() + "Không được để trống: ");
+                        courseDescription = sc.nextLine();
+                        if (courseDescription.isEmpty()) {
+                            System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
                         } else break;
                     }
 
-                    System.out.print(MainProgram.inputHead() + "Nhập tên giảng viên: ");
+                    System.out.print(StringPrefix.inputHead() + "Nhập tên giảng viên: ");
                     while (true) {
-                        coursesColumns.instructor = sc.nextLine();
-                        if (coursesColumns.instructor.isEmpty()) {
-                            System.out.print(MainProgram.errorHead() + "Không được để trống: ");
-                        } else if (sqlOperations.varcharLengthExceedCheck(coursesColumns.instructor, 50)) {
-                            System.out.print(MainProgram.errorHead() + "Nội dung phải nhỏ hơn 50 ký tự: ");
+                        instructor = sc.nextLine();
+                        if (instructor.isEmpty()) {
+                            System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+                        } else if (sqlOperations.varcharLengthExceedCheck(instructor, 50)) {
+                            System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 50 ký tự: ");
                         } else break;
                     }
 
-                    System.out.print(MainProgram.inputHead() + "Nhập tên khoa: ");
+                    System.out.print(StringPrefix.inputHead() + "Nhập tên khoa: ");
                     while (true) {
-                        coursesColumns.department = sc.nextLine();
-                        if (coursesColumns.department.isEmpty()) {
-                            System.out.print(MainProgram.errorHead() + "Không được để trống: ");
-                        } else if (sqlOperations.varcharLengthExceedCheck(coursesColumns.department, 50)) {
-                            System.out.print(MainProgram.errorHead() + "Nội dung phải nhỏ hơn 100 ký tự: ");
+                        department = sc.nextLine();
+                        if (department.isEmpty()) {
+                            System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+                        } else if (sqlOperations.varcharLengthExceedCheck(department, 50)) {
+                            System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 100 ký tự: ");
                         } else break;
                     }
 
                     System.out.println();
                     System.out.println("Thông tin khóa thứ " + selectionCoursesID + ":");
-                    System.out.println(MainProgram.bulletHead() + "Tên khóa: " + coursesColumns.courseName);
-                    System.out.println(MainProgram.bulletHead() + "Thông tin khóa: " + coursesColumns.courseDescription);
-                    System.out.println(MainProgram.bulletHead() + "Giảng viên: " + coursesColumns.instructor);
-                    System.out.println(MainProgram.bulletHead() + "Khoa: " + coursesColumns.department);
+                    System.out.println(StringPrefix.bulletHead() + "Tên khóa: " + courseName);
+                    System.out.println(StringPrefix.bulletHead() + "Thông tin khóa: " + courseDescription);
+                    System.out.println(StringPrefix.bulletHead() + "Giảng viên: " + instructor);
+                    System.out.println(StringPrefix.bulletHead() + "Khoa: " + department);
                     System.out.println("1. Xác nhận");
                     System.out.println("2. Nhập lại");
                     System.out.println("0. Hủy");
@@ -199,10 +249,10 @@ public class menuCourses extends AppMainHandler {
                             switch (selection) {
                                 case 1:
                                     String query = "UPDATE courses SET" +
-                                            " course_name = '" + coursesColumns.courseName +"'," +
-                                            " course_description = '" + coursesColumns.courseDescription + "'," +
-                                            " instructor = '" + coursesColumns.instructor +"'," +
-                                            " department = '" + coursesColumns.department + "'" +
+                                            " course_name = '" + courseName +"'," +
+                                            " course_description = '" + courseDescription + "'," +
+                                            " instructor = '" + instructor +"'," +
+                                            " department = '" + department + "'" +
                                             "WHERE course_id = " + selectionCoursesID + "";
                                     sqlOperations.editRows(query);
                                     System.out.print("Nhấn enter để tiếp tục: ");
@@ -213,12 +263,12 @@ public class menuCourses extends AppMainHandler {
                                 case 0:
                                     return;
                                 default:
-                                    System.out.print(MainProgram.errorHead() + "Vui lòng nhập lại: ");
+                                    System.out.print(StringPrefix.errorHead() + "Vui lòng nhập lại: ");
                                     continue;
                             }
                             break;
                         } catch (InputMismatchException e) {
-                            System.out.print(MainProgram.errorHead() + "Vui lòng nhập lại: ");
+                            System.out.print(StringPrefix.errorHead() + "Vui lòng nhập lại: ");
                             sc.next();
                             continue;
                         }
@@ -231,18 +281,15 @@ public class menuCourses extends AppMainHandler {
     }
 
     public void menuCoursesRemove() {
-        Scanner sc = new Scanner(System.in);
-        sc.useDelimiter("\\n");
-        SQLOperations sqlOperations = new SQLOperations();
-        CoursesColumns coursesColumns = new CoursesColumns();
         try {
+            Scanner sc = new Scanner(System.in);
+            sc.useDelimiter("\\n");
             while (true) {
-                System.out.print(MainProgram.inputHead() + "Chọn khóa cần xóa: ");
+                System.out.print(StringPrefix.inputHead() + "Chọn khóa cần xóa: ");
                 int selectionCoursesID;
                 while (true) {
                     try {
                         boolean success = false;
-                        Statement statement = MainProgram.connection.createStatement();
                         ResultSet resultSet = statement.executeQuery("SELECT course_id FROM courses ORDER BY course_id");
                         selectionCoursesID = sc.nextInt();
                         while (resultSet.next()) {
@@ -283,12 +330,12 @@ public class menuCourses extends AppMainHandler {
                             case 0:
                                 return;
                             default:
-                                System.out.print(MainProgram.errorHead() + "Vui lòng nhập lại: ");
+                                System.out.print(StringPrefix.errorHead() + "Vui lòng nhập lại: ");
                                 continue;
                         }
                         break;
                     } catch (InputMismatchException e) {
-                        System.out.print(MainProgram.errorHead() + "Vui lòng nhập lại: ");
+                        System.out.print(StringPrefix.errorHead() + "Vui lòng nhập lại: ");
                         sc.next();
                         continue;
                     }

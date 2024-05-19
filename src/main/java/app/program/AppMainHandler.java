@@ -6,20 +6,20 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public abstract class AppMainHandler {
-    protected String username;
-    protected String password;
+    protected static String username;
+    protected static String password;
     protected static Connection connection;
 
-    public void login() {
+    public static void login() {
         Scanner sc = new Scanner(System.in);
         sc.useDelimiter("\\n");
         System.out.println("Đăng nhập vào database");
         while(true) {
             System.out.print("Username: ");
-            this.username = sc.next();
+            username = sc.next();
             sc.nextLine();
             System.out.print("Password: ");
-            this.password = sc.next();
+            password = sc.next();
             sc.nextLine();
             if (connectionTest()) {
                 System.out.println("\n🟢 Kết nối database thành công");
@@ -31,7 +31,7 @@ public abstract class AppMainHandler {
         }
     }
 
-    public void closeConnection() {
+    public static void closeConnection() {
         try {
             connection.close();
             System.out.println("\nĐã ngắt kết nối tới database");
@@ -40,10 +40,10 @@ public abstract class AppMainHandler {
         }
     }
 
-    public boolean connectionTest() {
+    public static boolean connectionTest() {
         try {
             String url = "jdbc:mysql://localhost:3306/javasqlcuoiki";
-            connection = DriverManager.getConnection(url, this.username, this.password);
+            connection = DriverManager.getConnection(url, username, password);
             return true;
         } catch (SQLException e) {
             return false;

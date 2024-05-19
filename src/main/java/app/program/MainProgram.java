@@ -10,26 +10,34 @@ import app.program.menu.*;
 import util.DBTablePrinter;
 
 public class MainProgram extends AppMainHandler {
-    public menuStudents menuStudents = new menuStudents();
-    public menuCourses menuCourses = new menuCourses();
-
-    public static void selectionCursor() {
-        System.out.print("└─► ");
+    private static final MenuStudents menuStudents;
+    static {
+        try {
+            menuStudents = new MenuStudents();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static String inputHead() {
-        return "↪ ";
+    private static final MenuCourses menuCourses;
+    static {
+        try {
+            menuCourses = new MenuCourses();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static String bulletHead() {
-        return "• ";
+    private static final MenuEnrollments menuEnrollments;
+    static {
+        try {
+            menuEnrollments = new MenuEnrollments();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static String errorHead() {
-        return "⚠ ";
-    }
-
-    public void printASCII() {
+    public static void printASCII() {
         System.out.print("""
                 ┌──────────────────────────────────┐
                 │  ____  __  __ ____               │
@@ -42,7 +50,7 @@ public class MainProgram extends AppMainHandler {
                 """);
     }
 
-    public void menu() {
+    public static void menu() {
         Scanner sc = new Scanner(System.in);
         printASCII();
         while (true) {
@@ -58,19 +66,19 @@ public class MainProgram extends AppMainHandler {
                     │ 9. Trợ giúp & giới thiệu
                     │ 0. Thoát chương trình
                     """);
-            selectionCursor();
+            StringPrefix.selectionCursor();
             while (true){
                 try {
                     byte selection = sc.nextByte();
                     switch (selection) {
                         case 1:
-                            menuStudents();
+                            menuStudents.menuSelection();
                             break;
                         case 2:
-                            menuCourses();
+                            menuCourses.menuSelection();
                             break;
                         case 3:
-                            //menuEnrollments();
+                            menuEnrollments.menuSelection();
                             break;
                         case 9:
                             menuAppInfo();
@@ -80,13 +88,13 @@ public class MainProgram extends AppMainHandler {
                             return;
                         default:
                             System.out.println("Vui lòng nhập lại");
-                            selectionCursor();
+                            StringPrefix.selectionCursor();
                             continue;
                     }
                     break;
                 } catch (InputMismatchException e) {
                     System.out.println("Vui lòng nhập lại");
-                    selectionCursor();
+                    StringPrefix.selectionCursor();
                     sc.next();
                     continue;
                 }
@@ -94,97 +102,7 @@ public class MainProgram extends AppMainHandler {
         }
     }
 
-    public void menuStudents() {
-        Scanner sc = new Scanner(System.in);
-        while(true) {
-            System.out.println();
-            System.out.println("Danh sách các sinh viên");
-            printTable("students");
-            System.out.print("""
-                    │ Sử dụng các phím số để chọn các chức năng tương ứng
-                    │ 1. Thêm sinh viên
-                    │ 2. Sửa sinh viên
-                    │ 3. Xóa sinh viên
-                    │ 0. Quay về menu
-                    """);
-            selectionCursor();
-            while (true){
-                try {
-                    byte selection = sc.nextByte();
-                    switch (selection) {
-                        case 1:
-                            menuStudents.menuStudentsInsert();
-                            break;
-                        case 2:
-                            menuStudents.menuStudentsEdit();
-                            break;
-                        case 3:
-                            menuStudents.menuStudentsRemove();
-                            break;
-                        case 0:
-                            return;
-                        default:
-                            System.out.println("Vui lòng nhập lại");
-                            selectionCursor();
-                            continue;
-                    }
-                    break;
-                } catch (InputMismatchException e) {
-                    System.out.println("Vui lòng nhập lại");
-                    selectionCursor();
-                    sc.next();
-                    continue;
-                }
-            }
-        }
-    }
-
-    public void menuCourses() {
-        Scanner sc = new Scanner(System.in);
-        while(true) {
-            System.out.println();
-            System.out.println("Danh sách các khóa học");
-            printTable("courses");
-            System.out.print("""
-                    │ Sử dụng các phím số để chọn các chức năng tương ứng
-                    │ 1. Thêm khóa học
-                    │ 2. Sửa khóa học
-                    │ 3. Xóa khóa học
-                    │ 0. Quay về menu
-                    """);
-            selectionCursor();
-            while (true){
-                try {
-                    byte selection = sc.nextByte();
-                    switch (selection) {
-                        case 1:
-                            menuCourses.menuCoursesInsert();
-                            break;
-                        case 2:
-                            menuCourses.menuCoursesEdit();
-                            break;
-                        case 3:
-                            menuCourses.menuCoursesRemove();
-                            break;
-                        case 0:
-                            return;
-                        default:
-                            System.out.println("Vui lòng nhập lại");
-                            selectionCursor();
-                            continue;
-                    }
-                    break;
-                } catch (InputMismatchException e) {
-                    System.out.println("Vui lòng nhập lại");
-                    selectionCursor();
-                    sc.next();
-                    continue;
-                }
-            }
-        }
-    }
-
-    public void printTable(String table) {
+    public static void printTable(String table) {
         try {
             Statement statement = connection.createStatement();
             if (table == "students") {
@@ -197,7 +115,8 @@ public class MainProgram extends AppMainHandler {
                                 "    birthplace AS 'Quê quán',\n" +
                                 "    contact_number AS 'Số điện thoại',\n" +
                                 "    email AS 'Email',\n" +
-                                "    address AS 'Địa chỉ'\n" +
+                                "    address AS 'Địa chỉ',\n" +
+                                "    class_id AS 'Lớp'\n" +
                                 "FROM students;"
                 );
                 DBTablePrinter.printResultSet(resultSet);
@@ -208,16 +127,26 @@ public class MainProgram extends AppMainHandler {
                                 "    course_id AS 'ID khóa',\n" +
                                 "    course_name AS 'Tên khóa',\n" +
                                 "    course_description AS 'Thông tin khóa',\n" +
-                                "    instructor AS 'Giảng viên',\n" +
-                                "    department AS 'Khoa'\n" +
-                                "    FROM courses;"
+                                "    CONCAT(instructors.last_name,' ',instructors.middle_name,' ',instructors.first_name) AS 'Giảng viên',\n" +
+                                "    class_id AS 'Lớp'\n" +
+                                "FROM courses\n" +
+                                "JOIN instructors ON courses.instructor_id = instructors.instructor_id"
                 );
                 DBTablePrinter.printResultSet(resultSet);
             }
             if (table == "enrollments") {
-                ResultSet resultSet = statement.executeQuery(
-                        ""
-                );
+                ResultSet resultSet = statement.executeQuery("""
+                    SELECT
+                        students.student_id AS 'MSSV',
+                        CONCAT(students.last_name,' ',students.middle_name,' ',students.first_name) AS 'Họ và tên',
+                        courses.course_id AS 'ID Khóa',
+                        courses.course_name AS 'Tên khóa',
+                        grade
+                    FROM enrollments
+                    JOIN students ON enrollments.student_id = students.student_id
+                    JOIN courses ON enrollments.course_id = courses.course_id
+                    ORDER BY students.student_id ASC
+                    """);
                 DBTablePrinter.printResultSet(resultSet);
             }
         } catch (SQLException e) {
@@ -225,7 +154,7 @@ public class MainProgram extends AppMainHandler {
         }
     }
 
-    public void menuAppInfo() {
+    public static void menuAppInfo() {
         Scanner pressEnter = new Scanner(System.in);
         System.out.println();
         System.out.println("│ ░█▀█░█▀▄░█▀█░█░█░▀█▀");
@@ -237,7 +166,7 @@ public class MainProgram extends AppMainHandler {
         System.out.println("│         @Mỹ Duyên");
         System.out.println("│         @Ngọc Nhi");
         System.out.println("│ Nhấn enter để quay lại   ");
-        selectionCursor();
+        StringPrefix.selectionCursor();
         pressEnter.nextLine();
     }
 }
