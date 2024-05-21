@@ -1,8 +1,7 @@
 # SMS: Student Management System
-> Version *v0.9.0*
+> Version *v1.0.1*
 
 ## To do
-- Hoàn thành menu quản lí ghi danh
 - Chuyển DBMS qua SQLite (Hiện tại đang dùng MySQL nên nó hơi rườm rà)
 
 ## Hướng dẫn sử dụng
