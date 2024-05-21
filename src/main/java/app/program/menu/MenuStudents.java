@@ -4,6 +4,7 @@ import app.program.AppMainHandler;
 import app.program.MainProgram;
 import app.program.SQLOperations;
 import app.program.StringPrefix;
+import util.DBTablePrinter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +19,7 @@ public class MenuStudents extends AppMainHandler {
     private SQLOperations sqlOperations = new SQLOperations();
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    private String studentID;
     private String fullName;
     private String lastName;
     private String middleName;
@@ -28,6 +30,7 @@ public class MenuStudents extends AppMainHandler {
     private String contactNumber;
     private String email;
     private String address;
+    private String classID;
 
     public MenuStudents() throws SQLException {
 
@@ -83,13 +86,39 @@ public class MenuStudents extends AppMainHandler {
             Scanner sc = new Scanner(System.in);
             sc.useDelimiter("\\n");
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            ResultSet resultSet = statement.executeQuery("SELECT student_id FROM students ORDER BY student_id DESC LIMIT 1");
-            resultSet.next();
-            int studentIDNewest = resultSet.getInt("student_id");
-            studentIDNewest++;
 
-            System.out.println("Nhập thông tin sinh viên thứ " + studentIDNewest);
             while (true) {
+                System.out.print(StringPrefix.inputHead() + "Nhập MSSV: ");
+                while (true) {
+                    try {
+                        boolean fail = false;
+                        ResultSet resultSet = statement.executeQuery("SELECT student_id FROM students GROUP BY student_id ORDER BY student_id");
+                        studentID = sc.next();
+                        if (studentID.isEmpty()) {
+                            System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+                        }
+                        else {
+                            while (resultSet.next()) {
+                                String studentIDResult = resultSet.getString("student_id");
+                                if (studentID.equals(studentIDResult)) {
+                                    fail = true;
+                                    break;
+                                }
+                            }
+                            if (fail) {
+                                System.out.print(StringPrefix.errorHead() + "Nội dung trùng hoặc không có trong danh sách: ");
+                            } else {
+                                if (sqlOperations.varcharLengthExceedCheck(studentID,10)) {
+                                    System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 10 ký tự: ");
+                                } else break;
+                            }
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.print(StringPrefix.errorHead() + "Vui lòng nhập đúng số thứ tự: ");
+                        sc.next();
+                    }
+                }
+
                 System.out.print(StringPrefix.inputHead() + "Nhập tên họ: ");
                 while (true) {
                     lastName = sc.nextLine();
@@ -193,8 +222,44 @@ public class MenuStudents extends AppMainHandler {
                     } else break;
                 }
 
+//                System.out.print(StringPrefix.inputHead() + "Nhập lớp: ");
+//                while (true) {
+//                    classID = sc.next();
+//                    if (classID.isEmpty()) {
+//                        System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+//                    } else if (sqlOperations.varcharLengthExceedCheck(address, 10)) {
+//                        System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 10 ký tự: ");
+//                    } else break;
+//                }
+
+                ResultSet classTable = statement.executeQuery("SELECT class_id AS 'Lớp', major_name AS 'Ngành' FROM classes JOIN javasqlcuoiki.majors m on m.major_id = classes.major_id");
+                DBTablePrinter.printResultSet(classTable);
+                System.out.print(StringPrefix.inputHead() + "Nhập lớp: ");
+                while (true) {
+                    try {
+                        boolean success = false;
+                        ResultSet resultSet = statement.executeQuery("SELECT class_id FROM classes");
+                        classID = sc.next();
+                        while (resultSet.next()) {
+                            String classIDResult = resultSet.getString("class_id");
+                            if (classID.equals(classIDResult)) {
+                                success = true;
+                                break;
+                            }
+                        }
+                        if (success) {
+                            break;
+                        } else {
+                            System.out.print(StringPrefix.errorHead() + "Không có trong danh sách: ");
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.print(StringPrefix.errorHead() + "Vui lòng nhập đúng số thứ tự: ");
+                        sc.next();
+                    }
+                }
+
                 System.out.println();
-                System.out.println("Thông tin sinh viên thứ " + studentIDNewest + ":");
+                System.out.println(StringPrefix.bulletHead() + "MSSV: " + studentID);
                 fullName = lastName + " " + middleName + " " + firstName;
                 System.out.println(StringPrefix.bulletHead() + "Họ và tên: " + fullName);
                 System.out.print(StringPrefix.bulletHead() + "Giới tính: ");
@@ -208,6 +273,7 @@ public class MenuStudents extends AppMainHandler {
                 System.out.println(StringPrefix.bulletHead() + "Số điện thoại: " + contactNumber);
                 System.out.println(StringPrefix.bulletHead() + "Email: " + email);
                 System.out.println(StringPrefix.bulletHead() + "Địa chỉ: " + address);
+                System.out.println(StringPrefix.bulletHead() + "Lớp: " + classID);
                 System.out.println("1. Xác nhận");
                 System.out.println("2. Nhập lại");
                 System.out.println("0. Hủy");
@@ -216,17 +282,19 @@ public class MenuStudents extends AppMainHandler {
                         byte selection = sc.nextByte();
                         switch (selection) {
                             case 1:
-                                String query = "INSERT INTO students (last_name, middle_name, first_name, gender, date_of_birth, birthplace, contact_number, email, address) VALUE" +
-                                        "(" +
-                                        "'" + lastName + "'," +
-                                        "'" + middleName + "'," +
-                                        "'" + firstName + "'," +
-                                        "'" + gender + "'," +
-                                        "'" + dateOfBirth + "'," +
-                                        "'" + birthplace + "'," +
-                                        "'" + contactNumber + "'," +
-                                        "'" + email + "'," +
-                                        "'" + address + "')";
+                                String query = "INSERT INTO students (student_id, last_name, middle_name, first_name, gender, date_of_birth, birthplace, contact_number, email, address, class_id) VALUE (\n"
+                                        + "'" + studentID + "',\n"
+                                        + "'" + lastName + "',\n"
+                                        + "'" + middleName + "',\n"
+                                        + "'" + firstName + "',\n"
+                                        + "'" + gender + "',\n"
+                                        + "'" + dateOfBirth + "',\n"
+                                        + "'" + birthplace + "',\n"
+                                        + "'" + contactNumber + "',\n"
+                                        + "'" + email + "',\n"
+                                        + "'" + address + "',\n"
+                                        + "'" + classID
+                                        + "')";
                                 sqlOperations.insertRows(query);
                                 System.out.print("Nhấn enter để tiếp tục: ");
                                 sc.nextLine();
@@ -258,15 +326,15 @@ public class MenuStudents extends AppMainHandler {
             sc.useDelimiter("\\n");
             while (true) {
                 System.out.print(StringPrefix.inputHead() + "Chọn MSSV cần sửa: ");
-                int selectionStudentID;
+                String selectionStudentID;
                 while (true) {
                     try {
                         boolean success = false;
                         ResultSet resultSet = statement.executeQuery("SELECT student_id FROM students ORDER BY student_id");
-                        selectionStudentID = sc.nextInt();
+                        selectionStudentID = sc.next();
                         while (resultSet.next()) {
-                            int studentID = resultSet.getInt("student_id");
-                            if (selectionStudentID == studentID) {
+                            String studentID = resultSet.getString("student_id");
+                            if (studentID.equals(selectionStudentID)) {
                                 success = true;
                                 break;
                             }
@@ -274,10 +342,10 @@ public class MenuStudents extends AppMainHandler {
                         if (success) {
                             break;
                         } else {
-                            System.out.print("Không có trong danh sách: ");
+                            System.out.print(StringPrefix.errorHead() + "Không có trong danh sách: ");
                         }
                     } catch (InputMismatchException e) {
-                        System.out.print("Vui lòng nhập đúng số thứ tự: ");
+                        System.out.print(StringPrefix.errorHead() + "Vui lòng nhập đúng số thứ tự: ");
                         sc.next();
                     }
                 }
@@ -386,8 +454,34 @@ public class MenuStudents extends AppMainHandler {
                         } else break;
                     }
 
+                    ResultSet classTable = statement.executeQuery("SELECT class_id AS 'Lớp', major_name AS 'Ngành' FROM classes JOIN javasqlcuoiki.majors m on m.major_id = classes.major_id");
+                    DBTablePrinter.printResultSet(classTable);
+                    System.out.print(StringPrefix.inputHead() + "Nhập lớp: ");
+                    while (true) {
+                        try {
+                            boolean success = false;
+                            ResultSet resultSet = statement.executeQuery("SELECT class_id FROM classes");
+                            classID = sc.next();
+                            while (resultSet.next()) {
+                                String classIDResult = resultSet.getString("class_id");
+                                if (classID.equals(classIDResult)) {
+                                    success = true;
+                                    break;
+                                }
+                            }
+                            if (success) {
+                                break;
+                            } else {
+                                System.out.print(StringPrefix.errorHead() + "Không có trong danh sách: ");
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.print(StringPrefix.errorHead() + "Vui lòng nhập đúng số thứ tự: ");
+                            sc.next();
+                        }
+                    }
+
                     System.out.println();
-                    System.out.println("Thông tin sinh viên thứ " + selectionStudentID + ":");
+                    System.out.println(StringPrefix.bulletHead() + "MSSV: " + selectionStudentID);
                     fullName = lastName + " " + middleName + " " + firstName;
                     System.out.println(StringPrefix.bulletHead() + "Họ và tên: " + fullName);
                     System.out.print(StringPrefix.bulletHead() + "Giới tính: ");
@@ -396,12 +490,12 @@ public class MenuStudents extends AppMainHandler {
                     } else {
                         System.out.println("Nữ");
                     }
-                    System.out.println(StringPrefix.bulletHead() + "MSSV: " + selectionStudentID);
                     System.out.println(StringPrefix.bulletHead() + "Ngày sinh: " + dateOfBirth.format(dateTimeFormatter));
                     System.out.println(StringPrefix.bulletHead() + "Nơi sinh: " + birthplace);
                     System.out.println(StringPrefix.bulletHead() + "Số điện thoại: " + contactNumber);
                     System.out.println(StringPrefix.bulletHead() + "Email: " + email);
                     System.out.println(StringPrefix.bulletHead() + "Địa chỉ: " + address);
+                    System.out.println(StringPrefix.bulletHead() + "Lớp: " + classID);
                     System.out.println("1. Xác nhận");
                     System.out.println("2. Nhập lại");
                     System.out.println("0. Hủy");
@@ -437,7 +531,6 @@ public class MenuStudents extends AppMainHandler {
                         } catch (InputMismatchException e) {
                             System.out.print(StringPrefix.errorHead() + "Vui lòng nhập lại: ");
                             sc.next();
-                            continue;
                         }
                     }
                 }
@@ -453,15 +546,15 @@ public class MenuStudents extends AppMainHandler {
             sc.useDelimiter("\\n");
             while (true) {
                 System.out.print(StringPrefix.inputHead() + "Chọn MSSV cần xóa: ");
-                int selectionStudentID;
+                String selectionStudentID;
                 while (true) {
                     try {
                         boolean success = false;
                         ResultSet resultSet = statement.executeQuery("SELECT student_id FROM students ORDER BY student_id");
-                        selectionStudentID = sc.nextInt();
+                        selectionStudentID = sc.next();
                         while (resultSet.next()) {
-                            int studentID = resultSet.getInt("student_id");
-                            if (selectionStudentID == studentID) {
+                            String studentID = resultSet.getString("student_id");
+                            if (studentID.equals(selectionStudentID)) {
                                 success = true;
                                 break;
                             }
@@ -489,8 +582,6 @@ public class MenuStudents extends AppMainHandler {
                             case 1:
                                 String query = "DELETE FROM students WHERE student_id = " + selectionStudentID + "";
                                 sqlOperations.removeRows(query);
-                                System.out.print("Nhấn enter để tiếp tục: ");
-                                sc.nextLine();
                                 return;
                             case 2:
                                 break;
@@ -504,7 +595,6 @@ public class MenuStudents extends AppMainHandler {
                     } catch (InputMismatchException e) {
                         System.out.print(StringPrefix.errorHead() + "Vui lòng nhập lại: ");
                         sc.next();
-                        continue;
                     }
                 }
             }

@@ -41,7 +41,7 @@ public class MainProgram extends AppMainHandler {
         System.out.print("""
                 ┌──────────────────────────────────┐
                 │  ____  __  __ ____               │
-                │ / ___||  \\/  / ___|       v0.9.0 │
+                │ / ___||  \\/  / ___|       v1.0.0 │
                 │ \\___ \\| |\\/| \\___ \\      Student │
                 │  ___) | |  | |___) |  Management │
                 │ |____/|_|  |_|____/       System │
@@ -84,19 +84,45 @@ public class MainProgram extends AppMainHandler {
                             menuAppInfo();
                             break;
                         case 0:
-                            closeConnection();
-                            return;
+                            System.out.println();
+                            System.out.print("""
+                                            │ Bạn có chắc chắn muốn thoát?
+                                            │ 1. Thoát
+                                            │ 0. Hủy
+                                            """);
+                            StringPrefix.selectionCursor();
+                            while (true) {
+                                try {
+                                    selection = sc.nextByte();
+                                    switch (selection) {
+                                        case 1:
+                                            closeConnection();
+                                            return;
+                                        case 0:
+                                            break;
+                                        default:
+                                            System.out.println(StringPrefix.errorHead() + "Vui lòng chọn đúng số");
+                                            StringPrefix.selectionCursor();
+                                            continue;
+                                    }
+                                    break;
+                                } catch (InputMismatchException e) {
+                                    System.out.println(StringPrefix.errorHead() + "Vui lòng chọn đúng số");
+                                    StringPrefix.selectionCursor();
+                                    sc.next();
+                                }
+                            }
+                            break;
                         default:
-                            System.out.println("Vui lòng nhập lại");
+                            System.out.println(StringPrefix.errorHead() + "Vui lòng nhập lại");
                             StringPrefix.selectionCursor();
                             continue;
                     }
                     break;
                 } catch (InputMismatchException e) {
-                    System.out.println("Vui lòng nhập lại");
+                    System.out.println(StringPrefix.errorHead() + "Vui lòng nhập lại");
                     StringPrefix.selectionCursor();
                     sc.next();
-                    continue;
                 }
             }
         }
@@ -124,13 +150,14 @@ public class MainProgram extends AppMainHandler {
             if (table == "courses") {
                 ResultSet resultSet = statement.executeQuery(
                         "SELECT\n" +
-                                "    course_id AS 'ID khóa',\n" +
-                                "    course_name AS 'Tên khóa',\n" +
-                                "    course_description AS 'Thông tin khóa',\n" +
-                                "    CONCAT(instructors.last_name,' ',instructors.middle_name,' ',instructors.first_name) AS 'Giảng viên',\n" +
+                                "    course_id AS 'Mã môn',\n" +
+                                "    course_name AS 'Tên môn',\n" +
+                                "    course_description AS 'Mô tả',\n" +
+                                "    credits AS 'Tín chỉ',\n" +
+                                "    CONCAT(last_name,' ',middle_name,' ',first_name) AS 'Tên giảng viên',\n" +
                                 "    class_id AS 'Lớp'\n" +
                                 "FROM courses\n" +
-                                "JOIN instructors ON courses.instructor_id = instructors.instructor_id"
+                                "JOIN javasqlcuoiki.instructors i on i.instructor_id = courses.instructor_id"
                 );
                 DBTablePrinter.printResultSet(resultSet);
             }
@@ -139,8 +166,8 @@ public class MainProgram extends AppMainHandler {
                     SELECT
                         students.student_id AS 'MSSV',
                         CONCAT(students.last_name,' ',students.middle_name,' ',students.first_name) AS 'Họ và tên',
-                        courses.course_id AS 'ID Khóa',
-                        courses.course_name AS 'Tên khóa',
+                        courses.course_id AS 'Mã môn học',
+                        courses.course_name AS 'Tên môn học',
                         grade
                     FROM enrollments
                     JOIN students ON enrollments.student_id = students.student_id
@@ -157,15 +184,17 @@ public class MainProgram extends AppMainHandler {
     public static void menuAppInfo() {
         Scanner pressEnter = new Scanner(System.in);
         System.out.println();
-        System.out.println("│ ░█▀█░█▀▄░█▀█░█░█░▀█▀");
-        System.out.println("│ ░█▀█░█▀▄░█░█░█░█░░█░");
-        System.out.println("│ ░▀░▀░▀▀░░▀▀▀░▀▀▀░░▀░");
-        System.out.println("│ Student Management System");
-        System.out.println("│ Version 1.0.0");
-        System.out.println("│ Credits @Khang Đào");
-        System.out.println("│         @Mỹ Duyên");
-        System.out.println("│         @Ngọc Nhi");
-        System.out.println("│ Nhấn enter để quay lại   ");
+        System.out.print("""
+                │ ░█▀█░█▀▄░█▀█░█░█░▀█▀
+                │ ░█▀█░█▀▄░█░█░█░█░░█░
+                │ ░▀░▀░▀▀░░▀▀▀░▀▀▀░░▀░
+                │ Student Management System
+                │ Version 1.0.0
+                │ Credits @Khang Đào
+                │         @Mỹ Duyên
+                │         @Ngọc Nhi
+                │ Nhấn enter để quay lại
+                """);
         StringPrefix.selectionCursor();
         pressEnter.nextLine();
     }
