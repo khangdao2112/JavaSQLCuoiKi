@@ -30,6 +30,7 @@ public class MenuStudents extends AppMainHandler {
     private String contactNumber;
     private String email;
     private String address;
+    private String IDNumber;
     private String classID;
 
     public MenuStudents() throws SQLException {
@@ -222,15 +223,16 @@ public class MenuStudents extends AppMainHandler {
                     } else break;
                 }
 
-//                System.out.print(StringPrefix.inputHead() + "Nhập lớp: ");
-//                while (true) {
-//                    classID = sc.next();
-//                    if (classID.isEmpty()) {
-//                        System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
-//                    } else if (sqlOperations.varcharLengthExceedCheck(address, 10)) {
-//                        System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 10 ký tự: ");
-//                    } else break;
-//                }
+                System.out.print(StringPrefix.inputHead() + "Nhập số CCCD: ");
+                while (true) {
+                    IDNumber = sc.next();
+                    sc.nextLine();
+                    if (IDNumber.isEmpty()) {
+                        System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+                    } else if (sqlOperations.varcharLengthExceedCheck(IDNumber, 12)) {
+                        System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 12 ký tự: ");
+                    } else break;
+                }
 
                 ResultSet classTable = statement.executeQuery("SELECT class_id AS 'Lớp', major_name AS 'Ngành' FROM classes JOIN javasqlcuoiki.majors m on m.major_id = classes.major_id");
                 DBTablePrinter.printResultSet(classTable);
@@ -273,6 +275,7 @@ public class MenuStudents extends AppMainHandler {
                 System.out.println(StringPrefix.bulletHead() + "Số điện thoại: " + contactNumber);
                 System.out.println(StringPrefix.bulletHead() + "Email: " + email);
                 System.out.println(StringPrefix.bulletHead() + "Địa chỉ: " + address);
+                System.out.println(StringPrefix.bulletHead() + "Số CCCD: " + IDNumber);
                 System.out.println(StringPrefix.bulletHead() + "Lớp: " + classID);
                 System.out.println("1. Xác nhận");
                 System.out.println("2. Nhập lại");
@@ -282,7 +285,7 @@ public class MenuStudents extends AppMainHandler {
                         byte selection = sc.nextByte();
                         switch (selection) {
                             case 1:
-                                String query = "INSERT INTO students (student_id, last_name, middle_name, first_name, gender, date_of_birth, birthplace, contact_number, email, address, class_id) VALUE (\n"
+                                String query = "INSERT INTO students (student_id, last_name, middle_name, first_name, gender, date_of_birth, birthplace, contact_number, email, address, id_number, class_id) VALUE (\n"
                                         + "'" + studentID + "',\n"
                                         + "'" + lastName + "',\n"
                                         + "'" + middleName + "',\n"
@@ -293,6 +296,7 @@ public class MenuStudents extends AppMainHandler {
                                         + "'" + contactNumber + "',\n"
                                         + "'" + email + "',\n"
                                         + "'" + address + "',\n"
+                                        + "'" + IDNumber + "',\n"
                                         + "'" + classID
                                         + "')";
                                 sqlOperations.insertRows(query);
@@ -311,7 +315,6 @@ public class MenuStudents extends AppMainHandler {
                     } catch (InputMismatchException e) {
                         System.out.print(StringPrefix.errorHead() + "Vui lòng nhập lại: ");
                         sc.next();
-                        continue;
                     }
                 }
             }
@@ -454,6 +457,17 @@ public class MenuStudents extends AppMainHandler {
                         } else break;
                     }
 
+                    System.out.print(StringPrefix.inputHead() + "Nhập số CCCD: ");
+                    while (true) {
+                        IDNumber = sc.next();
+                        sc.nextLine();
+                        if (IDNumber.isEmpty()) {
+                            System.out.print(StringPrefix.errorHead() + "Không được để trống: ");
+                        } else if (sqlOperations.varcharLengthExceedCheck(IDNumber, 12)) {
+                            System.out.print(StringPrefix.errorHead() + "Nội dung phải nhỏ hơn 12 ký tự: ");
+                        } else break;
+                    }
+
                     ResultSet classTable = statement.executeQuery("SELECT class_id AS 'Lớp', major_name AS 'Ngành' FROM classes JOIN javasqlcuoiki.majors m on m.major_id = classes.major_id");
                     DBTablePrinter.printResultSet(classTable);
                     System.out.print(StringPrefix.inputHead() + "Nhập lớp: ");
@@ -495,6 +509,7 @@ public class MenuStudents extends AppMainHandler {
                     System.out.println(StringPrefix.bulletHead() + "Số điện thoại: " + contactNumber);
                     System.out.println(StringPrefix.bulletHead() + "Email: " + email);
                     System.out.println(StringPrefix.bulletHead() + "Địa chỉ: " + address);
+                    System.out.println(StringPrefix.bulletHead() + "Số CCCD: " + IDNumber);
                     System.out.println(StringPrefix.bulletHead() + "Lớp: " + classID);
                     System.out.println("1. Xác nhận");
                     System.out.println("2. Nhập lại");
@@ -513,7 +528,9 @@ public class MenuStudents extends AppMainHandler {
                                             "birthplace = '" + birthplace + "'," +
                                             "contact_number = '" + contactNumber + "'," +
                                             "email = '" + email + "'," +
-                                            "address = '" + address + "'" +
+                                            "address = '" + address + "'," +
+                                            "id_number = '" + IDNumber + "'," +
+                                            "class_id = '" + classID + "'" +
                                             "WHERE student_id = '" + selectionStudentID + "';";
                                     sqlOperations.editRows(query);
                                     System.out.print("Nhấn enter để tiếp tục: ");

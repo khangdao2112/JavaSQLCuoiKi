@@ -15,15 +15,15 @@
 - Tải hoặc clone bằng IntelliJ IDEA source này về máy
 - Tải về:
   - Chọn Code > Download ZIP  
-  ![](img/downloadzip.png)
+  ![](img/readme/downloadzip.png)
   - Giải nén xong mở IntelliJ IDEA mở thư mục đã giải nén
 - Clone:
   - Chọn Code > Bấm nút này để copy link  
-  ![](img/clonerepo.png)
+  ![](img/readme/clonerepo.png)
   - Mở IntelliJ IDEA chọn Get from VCS  
-  ![](img/getfromvcs.png)
+  ![](img/readme/getfromvcs.png)
   - Copy link vừa rồi vào đây  
-  ![](img/gitclone.png)
+  ![](img/readme/gitclone.png)
 
 ### Chạy
 - Chạy file [query này](src/main/java/app/program/data/console.sql) trước

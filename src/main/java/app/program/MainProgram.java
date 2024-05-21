@@ -41,7 +41,7 @@ public class MainProgram extends AppMainHandler {
         System.out.print("""
                 ┌──────────────────────────────────┐
                 │  ____  __  __ ____               │
-                │ / ___||  \\/  / ___|       v1.0.0 │
+                │ / ___||  \\/  / ___|       v1.0.1 │
                 │ \\___ \\| |\\/| \\___ \\      Student │
                 │  ___) | |  | |___) |  Management │
                 │ |____/|_|  |_|____/       System │
@@ -142,6 +142,7 @@ public class MainProgram extends AppMainHandler {
                                 "    contact_number AS 'Số điện thoại',\n" +
                                 "    email AS 'Email',\n" +
                                 "    address AS 'Địa chỉ',\n" +
+                                "    id_number AS 'Số CCCD',\n" +
                                 "    class_id AS 'Lớp'\n" +
                                 "FROM students;"
                 );

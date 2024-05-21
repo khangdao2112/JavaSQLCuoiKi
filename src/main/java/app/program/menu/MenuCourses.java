@@ -153,7 +153,7 @@ public class MenuCourses extends AppMainHandler {
                 ResultSet classTable = statement.executeQuery(
                         "SELECT class_id AS 'Lớp', department_name AS 'Khoa' FROM classes\n" +
                         "JOIN javasqlcuoiki.majors m on m.major_id = classes.major_id\n" +
-                        "JOIN javasqlcuoiki.department d on d.department_id = m.department_id"
+                        "JOIN javasqlcuoiki.departments d on d.department_id = m.department_id"
                 );
                 DBTablePrinter.printResultSet(classTable);
                 System.out.print(StringPrefix.inputHead() + "Nhập lớp: ");
@@ -334,7 +334,7 @@ public class MenuCourses extends AppMainHandler {
                     ResultSet classTable = statement.executeQuery(
                             "SELECT class_id AS 'Lớp', department_name AS 'Khoa' FROM classes\n" +
                                     "JOIN javasqlcuoiki.majors m on m.major_id = classes.major_id\n" +
-                                    "JOIN javasqlcuoiki.department d on d.department_id = m.department_id"
+                                    "JOIN javasqlcuoiki.departments d on d.department_id = m.department_id"
                     );
                     DBTablePrinter.printResultSet(classTable);
                     System.out.print(StringPrefix.inputHead() + "Nhập lớp: ");
